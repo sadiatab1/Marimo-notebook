@@ -1,57 +1,47 @@
 # Email: 23f3004490@ds.study.iitm.ac.in
-# Interactive Data Analysis Notebook using Marimo
-# ------------------------------------------------
-# This notebook demonstrates variable dependencies,
-# interactivity with a slider, and dynamic markdown
-# for self-documentation.
+# Marimo Interactive Notebook Demo
+# This notebook shows how variable dependencies, widgets, and dynamic markdown work.
 
-import marimo
+import marimo as mo
+
+# --------------------------
+# Cell 1: Import and slider
+# --------------------------
+# This slider represents "sample size" for a dataset.
+sample_size = mo.ui.slider(10, 500, value=100, label="Select Sample Size")
+sample_size
+
+# --------------------------
+# Cell 2: Generate data based on slider
+# --------------------------
+# Data depends on sample_size value chosen in Cell 1.
 import numpy as np
 import pandas as pd
 
-app = marimo.App()
+# Create synthetic dataset
+x = np.linspace(0, 10, sample_size.value)
+y = 2 * x + np.random.normal(0, 2, size=sample_size.value)
 
-# Cell 1: Define a slider widget
-# This slider controls the sample size `n` for data generation
-@app.cell
-def sample_slider():
-    return app.slider(
-        label="Select sample size (n)",
-        min=10,
-        max=500,
-        step=10,
-        value=100
-    )
+data = pd.DataFrame({"X": x, "Y": y})
+data.head()
 
-# Cell 2: Generate dataset
-# `n` comes from the slider → generates a dataset of `x` and `y`
-@app.cell
-def generate_data(sample_slider):
-    n = sample_slider.value
-    np.random.seed(42)
-    x = np.linspace(0, 10, n)
-    noise = np.random.normal(0, 1, n)
-    y = 2 * x + 3 + noise  # Linear relation with noise
-    data = pd.DataFrame({"x": x, "y": y})
-    return n, data
-
+# --------------------------
 # Cell 3: Summary statistics
-# Depends on dataset generated above
-@app.cell
-def compute_summary(data):
-    summary = data.describe().round(2)
-    return summary
+# --------------------------
+# This depends on Cell 2 (data).
+summary = data.describe()
+summary
 
-# Cell 4: Dynamic markdown output
-# Updates whenever sample size `n` or dataset changes
-@app.cell
-def dynamic_output(n, summary):
-    return app.markdown(f"""
-    ## 📊 Data Analysis Report  
-    - Current sample size: **{n}**
-    - Dataset summary:  
+# --------------------------
+# Cell 4: Dynamic Markdown
+# --------------------------
+# This Markdown depends on the slider value.
+mo.md(f"""
+### 📊 Interactive Data Analysis
 
-    {summary.to_markdown()}
-    """)
+You selected **{sample_size.value}** samples.  
+More samples generally make the data smoother.  
 
-app.run()
+🟢 "Green dots" represent the number of samples:  
+{"🟢" * (sample_size.value // 20)}
+""")
