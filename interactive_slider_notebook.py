@@ -13,13 +13,15 @@ app = marimo.App()
 
 # Cell 1: Define a slider widget
 # This slider controls the sample size `n` for data generation
-sample_slider = app.slider(
-    label="Select sample size (n)",
-    min=10,
-    max=500,
-    step=10,
-    value=100
-)
+@app.cell
+def sample_slider():
+    return app.slider(
+        label="Select sample size (n)",
+        min=10,
+        max=500,
+        step=10,
+        value=100
+    )
 
 # Cell 2: Generate dataset
 # `n` comes from the slider → generates a dataset of `x` and `y`
